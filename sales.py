@@ -19,8 +19,7 @@ upload_file = st.file_uploader("Оберіть файл Excel",type=['xlsx'])
 
 if upload_file:   
     data = pd.read_excel(upload_file)
-    data = data.rename(columns={'Unnamed: 2':'Describe','Unnamed: 5': 'Credits'})
-    data = data.drop([0,1]).reset_index(drop=True)    
+    data = data.rename(columns={'Unnamed: 2':'Describe','Unnamed: 5': 'Credits'}) 
     data['Credits'] = data['Credits'].apply(clean)
     data['Bank_acount'] = data['Describe'].apply(extract_digit)
     filtered_data = data[data['Bank_acount'].notna()]
