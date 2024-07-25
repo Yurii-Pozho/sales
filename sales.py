@@ -26,6 +26,6 @@ if upload_file:
     filtered_data = data[data['Bank_acount'].notna()]
     result_data = filtered_data[['Bank_acount','Credits']]
     table = result_data.pivot_table('Credits','Bank_acount',aggfunc='sum')
-
+#
     st.write('Результат обробки даних')
     st.dataframe(table)
