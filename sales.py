@@ -32,8 +32,6 @@ card_names = {
 
 pd.set_option('display.max_colwidth', None)
 
-st.title('Аналіз даних платіжної системи')
-
 upload_file = st.file_uploader("Оберіть файл Excel", type=['xlsx'])
 
 if upload_file:   
