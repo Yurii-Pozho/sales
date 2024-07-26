@@ -12,6 +12,8 @@ def clean(value):
         return 0 
 
 def extract_digit(description):
+    # Переконаємося, що description - це рядок
+    description = str(description)
     match = re.search(r'(\d{4})\.', description)
     return match.group(1) if match else None
 
@@ -32,18 +34,29 @@ card_names = {
 
 pd.set_option('display.max_colwidth', None)
 
+st.title('Аналіз даних платіжної системи')
+
 upload_file = st.file_uploader("Оберіть файл Excel", type=['xlsx'])
 
 if upload_file:   
     data = pd.read_excel(upload_file)
+    
+    # Перевірка перших кількох рядків даних
+    st.write("Початкові дані:")
+    st.dataframe(data.head())
 
     data = data.rename(columns={'Unnamed: 2': 'Describe', 'Unnamed: 5': 'Credits'})
+    data = data.drop([0, 1]).reset_index(drop=True)    
     data['Credits'] = data['Credits'].apply(clean)
     data['Bank_acount'] = data['Describe'].apply(extract_digit)
 
     # Додавання стовпця з назвами карт
     data['Card_Name'] = data['Bank_acount'].map(card_names)
     data['Card_Name'] = data['Card_Name'].fillna('<span style="color:red; font-weight:bold;">ФОП не вказаний</span>')
+
+    # Перевірка даних після додавання назв карт
+    st.write("Дані після додавання назв карт:")
+    st.dataframe(data.head())
 
     # Фільтруємо дані, щоб залишити лише ті, які мають значення у 'Bank_acount'
     filtered_data = data[data['Bank_acount'].notna()]
@@ -89,4 +102,3 @@ if upload_file:
     )
     
     st.markdown(table_html, unsafe_allow_html=True)
-    
