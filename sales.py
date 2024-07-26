@@ -12,8 +12,6 @@ def clean(value):
         return 0 
 
 def extract_digit(description):
-    # Переконаємося, що description - це рядок
-    description = str(description)
     match = re.search(r'(\d{4})\.', description)
     return match.group(1) if match else None
 
@@ -38,10 +36,6 @@ upload_file = st.file_uploader("Оберіть файл Excel", type=['xlsx'])
 
 if upload_file:   
     data = pd.read_excel(upload_file)
-    
-    # Перевірка перших кількох рядків даних
-    st.write("Початкові дані:")
-    st.dataframe(data.head())
 
     data = data.rename(columns={'Unnamed: 2': 'Describe', 'Unnamed: 5': 'Credits'})
     data = data.drop([0, 1]).reset_index(drop=True)    
@@ -52,51 +46,28 @@ if upload_file:
     data['Card_Name'] = data['Bank_acount'].map(card_names)
     data['Card_Name'] = data['Card_Name'].fillna('<span style="color:red; font-weight:bold;">ФОП не вказаний</span>')
 
-    # Перевірка даних після додавання назв карт
-    st.write("Дані після додавання назв карт:")
-    st.dataframe(data.head())
-
     # Фільтруємо дані, щоб залишити лише ті, які мають значення у 'Bank_acount'
     filtered_data = data[data['Bank_acount'].notna()]
     
     # Обираємо потрібні стовпці для виведення результатів
     result_data = filtered_data[['Bank_acount', 'Card_Name', 'Credits']]
     
-    # Форматуємо стовпець 'Credits' жирним шрифтом
-    result_data['Credits'] = result_data['Credits'].apply(lambda x: f'<b>{x}</b>')
-
     # Створюємо зведену таблицю
     table = result_data.pivot_table('Credits', ['Bank_acount', 'Card_Name'], aggfunc='sum')
-
-    # Запит користувача для вибору стовпця для сортування
-    sort_column = st.selectbox(
-        'Виберіть стовпець для сортування',
-        ['Bank_acount', 'Card_Name']
-    )
-
-    # Сортування даних
-    sorted_table = table.reset_index().sort_values(by=sort_column)
-    sorted_table = sorted_table.set_index(['Bank_acount', 'Card_Name'])
+    
+    # Сортуємо зведену таблицю за 'Card_Name'
+    table = table.reset_index().sort_values(by='Card_Name').set_index(['Bank_acount', 'Card_Name'])
     
     # Виводимо таблицю з форматуванням HTML
     st.write('Результат обробки даних')
 
     # Зміна форматування HTML для DataFrame
-    table_html = sorted_table.to_html(escape=False)
+    table_html = table.to_html(escape=False)
     
     # Замінюємо "ФОП не вказаний" на форматований текст
     table_html = table_html.replace(
         '<td>ФОП не вказаний</td>',
         '<td><span style="color:red; font-weight:bold;">ФОП не вказаний</span></td>'
-    )
-    
-    # Вставляємо жирний шрифт для Credits
-    table_html = table_html.replace(
-        '<td>',
-        '<td><b>'
-    ).replace(
-        '</td>',
-        '</b></td>'
     )
     
     st.markdown(table_html, unsafe_allow_html=True)
