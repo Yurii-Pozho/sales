@@ -27,7 +27,9 @@ card_names = {
     '9935': 'Шароді Унів', '6186': 'Шароді USD', '0025': 'Опанасенко ПДП',
     '3232': 'Опанасенко Унів', '6411': 'Опанасенко USD', '3804': 'Свіца ПДП',
     '4792': 'Свіца Унів', '3853': 'Свіца USD', '0906': 'Варчук ПДП',
-    '9740': 'Варчук Унів', '8506': 'Варчук USD'
+    '9740': 'Варчук Унів', '8506': 'Варчук USD',
+    '6629': 'Сашка USD', '2955': 'Стьопа МОНО', '2640': 'Сашка Приват $',
+    '2077': 'Chern', '9272': 'Сашка_ USD', '0661': 'Стьопа USD'
 }
 
 pd.set_option('display.max_colwidth', None)
@@ -37,8 +39,7 @@ upload_file = st.file_uploader("Оберіть файл Excel", type=['xlsx'])
 if upload_file:   
     data = pd.read_excel(upload_file)
 
-    data = data.rename(columns={'Unnamed: 2': 'Describe', 'Unnamed: 5': 'Credits'})
-    data = data.drop([0, 1]).reset_index(drop=True)    
+    data = data.rename(columns={'Unnamed: 2': 'Describe', 'Unnamed: 5': 'Credits'})  
     data['Credits'] = data['Credits'].apply(clean)
     data['Bank_acount'] = data['Describe'].apply(extract_digit)
 
