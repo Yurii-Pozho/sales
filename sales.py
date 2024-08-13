@@ -12,8 +12,10 @@ def clean(value):
         return 0 
 
 def extract_digit(description):
-    match = re.search(r'(\d{4})\.', description)
-    return match.group(1) if match else None
+    if isinstance(description, str):
+        match = re.search(r'(\d{4})\.', description)
+        return match.group(1) if match else None
+    return None
 
 # Відповідність номерів карт і їх назв
 card_names = {
